@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% from 'partials/_macros.html' import insignia %}
+{% block titulo %}Diccionario de datos{% endblock %}
+{% block contenido %}
+<div class="cabecera"><div><h1>Diccionario de datos</h1>
+  <p>Consultado en vivo desde las vistas USER_* de Oracle: tablas, procedimientos y secuencias del esquema.</p></div></div>
+
+<div class="tarjeta plana">
+  <div class="tarjeta-cab pad"><h2>Tablas <span class="muted small">({{ tablas|length }})</span></h2><span class="muted small">USER_TABLES · USER_TAB_COLUMNS · USER_CONSTRAINTS · USER_INDEXES</span></div>
+  <div class="tabla-caja"><table class="tabla">
+    <thead><tr><th>Tabla</th><th class="right">Columnas</th><th class="right">Restricciones</th><th class="right">Índices</th></tr></thead>
+    <tbody>{% for t in tablas %}<tr>
+      <td class="principal-celda"><a class="link" href="{{ url_for('diccionario.tabla', nombre=t.tabla) }}">{{ t.tabla }}</a></td>
+      <td class="right num">{{ t.columnas }}</td><td class="right num">{{ t.restricciones }}</td><td class="right num">{{ t.indices }}</td></tr>{% endfor %}
+    </tbody></table></div>
+</div>
+
+<div class="tarjeta plana mt-lg">
+  <div class="tarjeta-cab pad"><h2>Procedimientos, funciones, paquetes y triggers</h2><span class="muted small">USER_OBJECTS · USER_PROCEDURES · USER_SOURCE</span></div>
+  <div class="tabla-caja"><table class="tabla">
+    <thead><tr><th>Objeto</th><th>Tipo</th><th>Estado</th><th>Modificado</th></tr></thead>
+    <tbody>{% for o in objetos %}<tr>
+      <td class="principal-celda">{% if o.tipo in ('PACKAGE','PACKAGE BODY','TRIGGER','PROCEDURE','FUNCTION') %}<a class="link" href="{{ url_for('diccionario.objeto', nombre=o.objeto, tipo=o.tipo) }}">{{ o.objeto }}</a>{% else %}{{ o.objeto }}{% endif %}</td>
+      <td>{{ o.tipo }}</td><td>{{ o.estado }}</td><td class="muted small">{{ o.modificado }}</td></tr>{% endfor %}
+    </tbody></table></div>
+</div>
+
+<div class="tarjeta plana mt-lg">
+  <div class="tarjeta-cab pad"><h2>Secuencias</h2><span class="muted small">USER_SEQUENCES</span></div>
+  <div class="tabla-caja"><table class="tabla">
+    <thead><tr><th>Secuencia</th><th class="right">Mínimo</th><th class="right">Incremento</th><th class="right">Siguiente valor</th></tr></thead>
+    <tbody>{% for s in secuencias %}<tr><td class="principal-celda">{{ s.secuencia }}</td>
+      <td class="right num">{{ s.minimo }}</td><td class="right num">{{ s.incremento }}</td><td class="right num">{{ s.siguiente_valor }}</td></tr>{% endfor %}
+    </tbody></table></div>
+</div>
+{% endblock %}

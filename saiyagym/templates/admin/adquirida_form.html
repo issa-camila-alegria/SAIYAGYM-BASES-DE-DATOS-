@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% from 'partials/_macros.html' import campo, seleccion %}
+{% block titulo %}Registrar membresía{% endblock %}
+{% block contenido %}
+<div class="migas"><a href="{{ url_for('admin.adquiridas') }}">Membresías adquiridas</a> / Registrar</div>
+<div class="cabecera"><div><h1>Registrar membresía</h1>
+  <p>La fecha de fin y el valor se calculan solos con la duración y el precio vigente. Queda PENDIENTE hasta recibir un pago confirmado.</p></div></div>
+<div class="tarjeta">
+  <form method="post" class="formulario" novalidate>
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    {{ seleccion('usu_id', 'Cliente', clientes, form.get('usu_id',''), errores) }}
+    {{ seleccion('mem_id', 'Membresía', tipos, form.get('mem_id',''), errores) }}
+    {{ campo('inicio', 'Fecha de inicio', form, errores, 'date') }}
+    <div class="row"><button class="btn btn-primario" type="submit">Registrar</button>
+      <a class="btn btn-txt" href="{{ url_for('admin.adquiridas') }}">Cancelar</a></div>
+  </form>
+</div>
+{% endblock %}

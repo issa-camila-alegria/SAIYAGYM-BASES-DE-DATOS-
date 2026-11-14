@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% from 'partials/_macros.html' import seleccion %}
+{% block titulo %}Asignar rutina{% endblock %}
+{% block contenido %}
+<div class="migas"><a href="{{ url_for('entrenador.asignaciones') }}">Asignaciones</a> / Nueva</div>
+<div class="cabecera"><div><h1>Asignar rutina</h1>
+  <p>Solo clientes activos y rutinas con ejercicios. Al asignar, el cliente pasa a ser tu cliente.</p></div></div>
+<div class="tarjeta">
+  <form method="post" class="formulario" novalidate>
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    {{ seleccion('cliente_id', 'Cliente', clientes, form.get('cliente_id',''), errores) }}
+    {{ seleccion('rut_id', 'Rutina', rutinas, form.get('rut_id',''), errores) }}
+    <div class="row"><button class="btn btn-primario" type="submit">Asignar</button>
+      <a class="btn btn-txt" href="{{ url_for('entrenador.asignaciones') }}">Cancelar</a></div>
+  </form>
+</div>
+{% endblock %}

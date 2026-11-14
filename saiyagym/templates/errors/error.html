@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+{% block titulo %}{{ titulo }}{% endblock %}
+{% set cuerpo %}
+  <div class="error-pag"><div>
+    {% if codigo %}<div class="codigo-error">{{ codigo }}</div>{% endif %}
+    <h1 class="mt">{{ titulo }}</h1>
+    <p class="muted mt">{{ mensaje }}</p>
+    <p class="mt-lg"><a class="btn btn-oscuro" href="{{ url_for('auth.raiz') }}">Volver al inicio</a></p>
+  </div></div>
+{% endset %}
+{% block contenido %}{{ cuerpo }}{% endblock %}
+{% block publico %}<div class="acceso"><div class="acceso-caja">{{ cuerpo }}</div></div>{% endblock %}

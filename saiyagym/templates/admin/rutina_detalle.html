@@ -1,0 +1,8 @@
+{% extends 'base.html' %}
+{% block titulo %}{{ rutina.rutnombre }}{% endblock %}
+{% block contenido %}
+<div class="migas"><a href="{{ url_for('admin.rutinas') }}">Rutinas</a> / {{ rutina.rutnombre }}</div>
+<div class="cabecera"><div><h1>{{ rutina.rutnombre }}</h1>
+  <p>{{ rutina.rutobjetivo }} · {{ rutina.rutnivel|capitalize }} · por {{ rutina.entrenador }}</p></div></div>
+<div class="tarjeta plana">{% include 'partials/_lineas.html' %}</div>
+{% endblock %}

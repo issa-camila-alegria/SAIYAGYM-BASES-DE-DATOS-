@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% from 'partials/_macros.html' import brasas %}
+{% block titulo %}Iniciar sesión{% endblock %}
+{% block publico %}
+<div class="acceso">
+  <section class="acceso-lema" aria-label="SAIYAGYM">
+    {{ brasas(8) }}
+    <img class="logo-grande" src="{{ estatico('img/logo.png') }}" alt="SAIYAGYM - Fuerza y bienestar" width="670" height="720">
+  </section>
+  <section class="acceso-caja">
+    <div>
+      <div class="tarjeta">
+        <h2>Bienvenido</h2>
+        <form method="post" class="formulario" novalidate>
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <input type="hidden" name="siguiente" value="{{ siguiente }}">
+          <div class="campo">
+            <label for="correo">Correo electrónico</label>
+            <input id="correo" name="correo" type="email" value="{{ correo }}" autocomplete="username" autofocus required>
+          </div>
+          <div class="campo">
+            <label for="clave">Contraseña</label>
+            <input id="clave" name="clave" type="password" autocomplete="current-password" required>
+          </div>
+          <button class="btn btn-primario btn-lg" type="submit">Entrar</button>
+        </form>
+      </div>
+      <p class="pie-acceso">Universidad del Cauca · Bases de Datos II</p>
+    </div>
+  </section>
+</div>
+{% endblock %}

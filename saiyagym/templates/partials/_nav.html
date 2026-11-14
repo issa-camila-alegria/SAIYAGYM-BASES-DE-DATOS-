@@ -1,0 +1,47 @@
+{% from 'partials/_macros.html' import icono %}
+{% macro enlace(destino, texto, ico) -%}
+  {% set activo = request.path == destino or (destino != '/' and request.path.startswith(destino + '/')) %}
+  <a href="{{ destino }}" class="{{ 'activo' if activo }}">{{ icono(ico) }}<span>{{ texto }}</span></a>
+{%- endmacro %}
+{% macro grupo(titulo, ico, items) -%}
+  {% set ns = namespace(activo=false) %}
+  {% for destino, t, i in items %}{% if request.path == destino or request.path.startswith(destino + '/') %}{% set ns.activo = true %}{% endif %}{% endfor %}
+  <details class="{{ 'activo' if ns.activo }}">
+    <summary>{{ icono(ico) }}<span>{{ titulo }}</span></summary>
+    <div class="menu-grupo">
+      {% for destino, t, i in items %}{{ enlace(destino, t, i) }}{% endfor %}
+    </div>
+  </details>
+{%- endmacro %}
+<nav class="nav" aria-label="Navegacion principal">
+{% if usuario.rol == 'ADMINISTRADOR' %}
+  {{ enlace(url_for('admin.inicio'), 'Resumen', 'inicio') }}
+  {{ grupo('Gestión', 'usuarios', [
+      (url_for('admin.usuarios'), 'Usuarios', 'usuarios'),
+      (url_for('admin.membresias'), 'Tipos de membresía', 'tarjeta'),
+      (url_for('admin.adquiridas'), 'Membresías adquiridas', 'lista'),
+      (url_for('admin.pagos'), 'Pagos', 'dinero')]) }}
+  {{ grupo('Entrenamiento', 'pesa', [
+      (url_for('admin.rutinas'), 'Rutinas', 'pesa'),
+      (url_for('admin.ejercicios'), 'Ejercicios', 'libro'),
+      (url_for('admin.asignaciones'), 'Asignaciones', 'enlace'),
+      (url_for('admin.asistencia'), 'Asistencia', 'calendario')]) }}
+  {{ grupo('Análisis', 'grafica', [
+      (url_for('reportes.indice'), 'Informes', 'grafica'),
+      (url_for('diccionario.indice'), 'Diccionario de datos', 'base')]) }}
+{% elif usuario.rol == 'ENTRENADOR' %}
+  {{ enlace(url_for('entrenador.inicio'), 'Resumen', 'inicio') }}
+  {{ enlace(url_for('entrenador.clientes'), 'Mis clientes', 'usuarios') }}
+  {{ enlace(url_for('entrenador.rutinas'), 'Rutinas', 'pesa') }}
+  {{ enlace(url_for('entrenador.ejercicios'), 'Ejercicios', 'libro') }}
+  {{ enlace(url_for('entrenador.asignaciones'), 'Asignaciones', 'enlace') }}
+  {{ enlace(url_for('reportes.indice'), 'Informes', 'grafica') }}
+{% else %}
+  {{ enlace(url_for('cliente.inicio'), 'Mi panel', 'inicio') }}
+  {{ enlace(url_for('cliente.asistencias'), 'Asistencia y rachas', 'calendario') }}
+  {{ enlace(url_for('cliente.rutinas'), 'Mis rutinas', 'pesa') }}
+  {{ enlace(url_for('cliente.membresias'), 'Membresías', 'tarjeta') }}
+  {{ enlace(url_for('cliente.pagos'), 'Pagos', 'dinero') }}
+  {{ enlace(url_for('reportes.indice'), 'Mis informes', 'grafica') }}
+{% endif %}
+</nav>

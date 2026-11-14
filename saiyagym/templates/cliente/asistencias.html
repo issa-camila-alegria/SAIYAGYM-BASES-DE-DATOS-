@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% from 'partials/_macros.html' import vacio %}
+{% block titulo %}Asistencia{% endblock %}
+{% block contenido %}
+<div class="cabecera"><div><h1>Asistencia y rachas</h1><p>Cada día que asistes suma. Un día sin asistir reinicia la racha.</p></div></div>
+{% include 'partials/_racha.html' %}
+<div class="tarjeta mt">
+  <div class="tarjeta-cab"><h2>Este mes</h2><span class="muted small">{{ del_mes }} de {{ dias_mes }} días</span></div>
+  <progress value="{{ del_mes }}" max="{{ dias_mes }}"></progress>
+  <div class="calendario mt">
+    {% for c in cabeceras %}<div class="cal-cab">{{ c }}</div>{% endfor %}
+    {% for c in celdas %}{% if c %}<div class="cal-dia {{ 'asistio' if c.asistio }} {{ 'hoy' if c.hoy }}">{{ c.numero }}</div>{% else %}<div class="cal-dia vacio-d"></div>{% endif %}{% endfor %}
+  </div>
+</div>
+<div class="rejilla g2 mt">
+  <div class="tarjeta plana"><div class="tarjeta-cab pad"><h2>Mis asistencias</h2></div>
+    {% if lista %}<div class="tabla-caja"><table class="tabla"><tbody>
+      {% for a in lista %}<tr><td>{{ a.asifecha|fecha_larga }}</td><td class="right num muted">{{ a.asihoraentrada }}</td></tr>{% endfor %}
+    </tbody></table></div>{% else %}{{ vacio('Aún no registras asistencias') }}{% endif %}</div>
+  <div class="tarjeta plana"><div class="tarjeta-cab pad"><h2>Mis rachas</h2></div>
+    {% if rachas %}<div class="tabla-caja"><table class="tabla"><tbody>
+      {% for r in rachas %}<tr><td>{{ r.rachainicio|fecha }} → {{ r.rachafin|fecha }}</td><td class="right num">{{ r.rachadias }} día(s)</td></tr>{% endfor %}
+    </tbody></table></div>{% else %}{{ vacio('Sin rachas todavía') }}{% endif %}</div>
+</div>
+{% endblock %}

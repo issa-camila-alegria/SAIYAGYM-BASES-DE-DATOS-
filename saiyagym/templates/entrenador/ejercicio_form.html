@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% from 'partials/_macros.html' import campo, seleccion %}
+{% block titulo %}{{ 'Nuevo ejercicio' if modo == 'nuevo' else 'Editar ejercicio' }}{% endblock %}
+{% block contenido %}
+<div class="migas"><a href="{{ url_for('entrenador.ejercicios') }}">Ejercicios</a> / {{ 'Nuevo' if modo == 'nuevo' else 'Editar' }}</div>
+<div class="cabecera"><div><h1>{{ 'Nuevo ejercicio' if modo == 'nuevo' else 'Editar ejercicio' }}</h1></div></div>
+<div class="tarjeta">
+  <form method="post" class="formulario" novalidate>
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    {{ campo('nombre', 'Nombre', form, errores, extra='maxlength="100"') }}
+    <div class="rejilla-form">
+      {{ campo('grupo', 'Grupo muscular', form, errores, extra='maxlength="50" list="grupos"') }}
+      <datalist id="grupos">{% for g in grupos %}<option value="{{ g }}">{% endfor %}</datalist>
+      {{ seleccion('nivel', 'Nivel de dificultad', niveles, form.get('nivel',''), errores) }}
+    </div>
+    {{ campo('descripcion', 'Descripción', form, errores, requerido=false, extra='maxlength="200"') }}
+    <div class="row"><button class="btn btn-primario" type="submit">Guardar</button>
+      <a class="btn btn-txt" href="{{ url_for('entrenador.ejercicios') }}">Cancelar</a></div>
+  </form>
+</div>
+{% endblock %}

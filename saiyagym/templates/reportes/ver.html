@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% from 'partials/_macros.html' import insignia, vacio %}
+{% block titulo %}{{ codigo }}{% endblock %}
+{% block contenido %}
+<div class="migas"><a href="{{ url_for('reportes.indice') }}">Informes</a> / {{ codigo }}</div>
+<div class="cabecera"><div><h1>{{ titulo }}</h1><p>{{ descripcion }}</p></div>
+  <div class="row"><span class="muted small">{{ filas|length }} fila(s)</span>
+  <a class="btn btn-sm" href="{{ url_for('reportes.descargar', codigo=codigo) }}">Descargar CSV</a></div></div>
+<div class="tarjeta plana">
+{% if filas %}
+<div class="tabla-caja"><table class="tabla">
+  <thead><tr>{% for c in columnas %}<th>{{ c|replace('_', ' ') }}</th>{% endfor %}</tr></thead>
+  <tbody>{% for f in filas %}<tr>
+    {% for c in columnas %}{% set v = f[c] %}
+      <td class="{{ 'num' if v is number }}">
+        {%- if c in ('estado', 'situacion') %}{{ insignia(v) }}{% else %}{{ v if v is not none else '—' }}{% endif -%}
+      </td>
+    {% endfor %}</tr>{% endfor %}
+  </tbody></table></div>
+{% else %}{{ vacio('Sin resultados', 'Este informe no tiene datos por ahora.') }}{% endif %}
+</div>
+{% endblock %}

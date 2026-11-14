@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% from 'partials/_macros.html' import icono, insignia, accion, vacio %}
+{% block titulo %}Usuarios{% endblock %}
+{% block contenido %}
+<div class="cabecera">
+  <div><h1>Usuarios</h1><p>Administradores, entrenadores y clientes del gimnasio.</p></div>
+  <a class="btn btn-primario" href="{{ url_for('admin.usuario_nuevo') }}">{{ icono('mas') }} Nuevo usuario</a>
+</div>
+<div class="chips">
+  <a class="chip {{ 'activo' if not rol }}" href="{{ url_for('admin.usuarios', q=q) }}">Todos</a>
+  {% for r, t in [('ADMINISTRADOR','Administradores'),('ENTRENADOR','Entrenadores'),('CLIENTE','Clientes')] %}
+    <a class="chip {{ 'activo' if rol == r }}" href="{{ url_for('admin.usuarios', rol=r, q=q) }}">{{ t }}</a>
+  {% endfor %}
+</div>
+<form class="filtros" method="get">
+  {% if rol %}<input type="hidden" name="rol" value="{{ rol }}">{% endif %}
+  <input type="search" name="q" value="{{ q }}" placeholder="Buscar por nombre, correo o identificación">
+  <button class="btn" type="submit">Buscar</button>
+</form>
+<div class="tarjeta plana">
+{% if lista %}
+<div class="tabla-caja"><table class="tabla">
+  <thead><tr><th>Usuario</th><th>Identificación</th><th>Rol</th><th>Estado</th><th></th></tr></thead>
+  <tbody>
+  {% for u in lista %}
+    <tr>
+      <td class="principal-celda">{{ u.usunombre }} {{ u.usuapellido }}<span class="sec">{{ u.usucorreo }}</span></td>
+      <td class="num">{{ u.usuidentificacion }}</td>
+      <td>{{ u.rolnombre|capitalize }}</td>
+      <td>{{ insignia(u.usuestado) }}</td>
+      <td class="acciones">
+        <a class="btn btn-sm" href="{{ url_for('admin.usuario_editar', id_=u.usuid) }}">Editar</a>
+        {% if u.usuestado == 'ACTIVO' %}
+          {{ accion(url_for('admin.usuario_estado', id_=u.usuid), 'Desactivar', 'btn btn-sm', 'Desactivar a ' ~ u.usunombre ~ '? No podrá iniciar sesión ni operar.', {'estado': 'INACTIVO'}) }}
+        {% else %}
+          {{ accion(url_for('admin.usuario_estado', id_=u.usuid), 'Activar', 'btn btn-sm', '', {'estado': 'ACTIVO'}) }}
+        {% endif %}
+      </td>
+    </tr>
+  {% endfor %}
+  </tbody></table></div>
+{% else %}{{ vacio('Sin resultados', 'Prueba con otro filtro o búsqueda.') }}{% endif %}
+</div>
+{% endblock %}

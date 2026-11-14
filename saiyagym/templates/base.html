@@ -1,0 +1,48 @@
+{# PAGINA MAESTRA: marco comun (menu lateral por rol, avisos, usuario). Las vistas la extienden con {% extends %}. #}
+{% from 'partials/_macros.html' import icono, llama %}
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block titulo %}SAIYAGYM{% endblock %} · SAIYAGYM</title>
+  <link rel="icon" type="image/png" href="{{ estatico('img/logo-sm.png') }}">
+  <link rel="stylesheet" href="{{ estatico('css/app.css') }}">
+</head>
+<body>
+{% if usuario %}
+<div class="app">
+  <header class="encabezado">
+    <a class="marca" href="{{ url_for('auth.raiz') }}" aria-label="SAIYAGYM, inicio">
+      <span class="marca-icono"><img class="marca-logo" src="{{ estatico('img/logo-sm.png') }}" alt="" width="44" height="47"></span>
+      <span class="marca-texto"><strong>SAIYAGYM</strong><small>Gestión para gimnasios</small></span>
+    </a>
+    {% include 'partials/_nav.html' %}
+    <div class="yo">
+      <div class="yo-datos">
+        <div class="yo-nombre">{{ usuario.nombre }} {{ usuario.apellido }}</div>
+        <div class="yo-rol">{{ usuario.rol|lower }}</div>
+      </div>
+      <a class="avatar" href="{{ url_for('auth.perfil') }}" title="Mi perfil">{{ iniciales(usuario.nombre, usuario.apellido) }}</a>
+      <form method="post" action="{{ url_for('auth.logout') }}" class="en-linea">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <button class="btn btn-txt" type="submit" title="Cerrar sesión" aria-label="Cerrar sesión">{{ icono('salir') }}</button>
+      </form>
+    </div>
+  </header>
+  <main class="principal">
+    {% block contenido %}{% endblock %}
+    <footer class="pie"><span>SAIYAGYM · Bases de Datos II</span><span>Oracle 18c + PL/SQL</span></footer>
+  </main>
+</div>
+{% else %}
+  {% block publico %}{% endblock %}
+{% endif %}
+<div class="avisos" role="status" aria-live="polite">
+  {% with mensajes = get_flashed_messages(with_categories=true) %}
+    {% for categoria, texto in mensajes %}<div class="aviso {{ categoria }}">{{ texto }}</div>{% endfor %}
+  {% endwith %}
+</div>
+<script src="{{ estatico('js/app.js') }}"></script>
+</body>
+</html>

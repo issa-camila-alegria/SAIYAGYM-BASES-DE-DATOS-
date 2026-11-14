@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% from 'partials/_macros.html' import insignia, vacio %}
+{% block titulo %}{{ cliente.usunombre }}{% endblock %}
+{% block contenido %}
+<div class="migas"><a href="{{ url_for('entrenador.clientes') }}">Mis clientes</a> / {{ cliente.usunombre }}</div>
+<div class="cabecera"><div><h1>{{ cliente.usunombre }} {{ cliente.usuapellido }}</h1><p>{{ cliente.usucorreo }} · {{ insignia(cliente.usuestado) }}</p></div>
+  <a class="btn btn-primario" href="{{ url_for('entrenador.asignacion_nueva', cliente=cliente.usuid) }}">Asignar rutina</a></div>
+{% include 'partials/_racha.html' %}
+<div class="rejilla g2 mt">
+  <div class="tarjeta plana"><div class="tarjeta-cab pad"><h2>Historial de rutinas</h2></div>
+    {% if asignaciones %}<div class="tabla-caja"><table class="tabla"><tbody>
+      {% for a in asignaciones %}<tr><td class="principal-celda">{{ a.rutnombre }}<span class="sec">por {{ a.entrenador }} · {{ a.asirutfechaasignacion|fecha }}</span></td>
+        <td class="right">{{ insignia(a.asirutestado) }}</td></tr>{% endfor %}
+    </tbody></table></div>{% else %}{{ vacio('Sin rutinas') }}{% endif %}</div>
+  <div class="tarjeta plana"><div class="tarjeta-cab pad"><h2>Últimas asistencias</h2></div>
+    {% if asistencias %}<div class="tabla-caja"><table class="tabla"><tbody>
+      {% for a in asistencias %}<tr><td>{{ a.asifecha|fecha }}</td><td class="right num">{{ a.asihoraentrada }}</td></tr>{% endfor %}
+    </tbody></table></div>{% else %}{{ vacio('Sin asistencias registradas') }}{% endif %}</div>
+</div>
+{% endblock %}

@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+{% from 'partials/_macros.html' import accion, seleccion, vacio %}
+{% block titulo %}{{ rutina.rutnombre }}{% endblock %}
+{% block contenido %}
+<div class="migas"><a href="{{ url_for('entrenador.rutinas') }}">Rutinas</a> / {{ rutina.rutnombre }}</div>
+<div class="cabecera">
+  <div><h1>{{ rutina.rutnombre }}</h1><p>{{ rutina.rutobjetivo }} · {{ rutina.rutnivel|capitalize }} · {{ 'creada por ti' if propia else 'de ' ~ rutina.entrenador }}</p></div>
+  {% if propia %}<div class="row">
+    <a class="btn" href="{{ url_for('entrenador.rutina_editar', id_=rutina.rutid) }}">Editar datos</a>
+    {{ accion(url_for('entrenador.rutina_eliminar', id_=rutina.rutid), 'Eliminar', 'btn btn-peligro', '¿Eliminar la rutina ' ~ rutina.rutnombre ~ '?') }}
+  </div>{% endif %}
+</div>
+{% if rutina.rutdescripcion %}<p class="muted mb">{{ rutina.rutdescripcion }}</p>{% endif %}
+
+<div class="tarjeta plana">
+{% if lineas %}
+<div class="tabla-caja"><table class="tabla">
+  <thead><tr><th>Ejercicio</th><th>Grupo</th><th class="right">Series</th><th class="right">Repeticiones</th><th class="right">Descanso (s)</th>{% if propia %}<th></th>{% endif %}</tr></thead>
+  <tbody>{% for l in lineas %}
+    <tr>
+      <td class="principal-celda">{{ l.ejenombre }}<span class="sec">{{ l.ejeniveldificultad|capitalize }}</span></td>
+      <td>{{ l.ejegrupomuscular }}</td>
+      {% if propia %}
+      <td class="right"><input class="mini" form="lin-{{ l.rutejeid }}" name="series" type="number" min="1" max="20" value="{{ l.rutejeseries }}" aria-label="Series" required></td>
+      <td class="right"><input class="mini" form="lin-{{ l.rutejeid }}" name="repeticiones" type="number" min="1" max="200" value="{{ l.rutejerepeticiones }}" aria-label="Repeticiones" required></td>
+      <td class="right"><input class="mini" form="lin-{{ l.rutejeid }}" name="descanso" type="number" min="0" max="900" value="{{ l.rutejedescanso }}" aria-label="Descanso" required></td>
+      <td class="acciones">
+        <form id="lin-{{ l.rutejeid }}" method="post" action="{{ url_for('entrenador.linea_actualizar', id_=rutina.rutid, linea=l.rutejeid) }}" class="en-linea">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <button class="btn btn-sm" type="submit">Guardar</button>
+        </form>
+        {{ accion(url_for('entrenador.linea_quitar', id_=rutina.rutid, linea=l.rutejeid), 'Quitar', 'btn btn-sm btn-peligro', '¿Quitar este ejercicio de la rutina?') }}
+      </td>
+      {% else %}
+      <td class="right num">{{ l.rutejeseries }}</td><td class="right num">{{ l.rutejerepeticiones }}</td><td class="right num">{{ l.rutejedescanso }}</td>
+      {% endif %}
+    </tr>{% endfor %}
+  </tbody></table></div>
+{% else %}{{ vacio('Esta rutina aún no tiene ejercicios', 'Agrega al menos uno para poder asignarla a un cliente.') }}{% endif %}
+</div>
+
+{% if propia %}
+<div class="tarjeta mt">
+  <h2>Agregar ejercicio</h2>
+  {% if disponibles %}
+  <form method="post" action="{{ url_for('entrenador.rutina_agregar_ejercicio', id_=rutina.rutid) }}" class="formulario ancho" novalidate>
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    {{ seleccion('eje_id', 'Ejercicio', disponibles, '', errores) }}
+    <div class="rejilla-form" data-cols="3">
+      <div class="campo"><label for="series">Series</label><input id="series" name="series" type="number" min="1" max="20" value="3" required></div>
+      <div class="campo"><label for="repeticiones">Repeticiones</label><input id="repeticiones" name="repeticiones" type="number" min="1" max="200" value="12" required></div>
+      <div class="campo"><label for="descanso">Descanso (s)</label><input id="descanso" name="descanso" type="number" min="0" max="900" value="60" required></div>
+    </div>
+    <div><button class="btn btn-primario" type="submit">Agregar a la rutina</button></div>
+  </form>
+  {% else %}<p class="muted">Ya agregaste todos los ejercicios del catálogo.</p>{% endif %}
+</div>
+{% endif %}
+{% endblock %}

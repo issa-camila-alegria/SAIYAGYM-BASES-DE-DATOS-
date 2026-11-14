@@ -1,0 +1,7 @@
+{% extends 'base.html' %}
+{% block titulo %}{{ asignacion.rutnombre }}{% endblock %}
+{% block contenido %}
+<div class="migas"><a href="{{ url_for('cliente.rutinas') }}">Mis rutinas</a> / {{ asignacion.rutnombre }}</div>
+<div class="cabecera"><div><h1>{{ asignacion.rutnombre }}</h1><p>{{ asignacion.rutobjetivo }} · {{ asignacion.rutnivel|capitalize }} · con {{ asignacion.entrenador }}</p></div></div>
+<div class="tarjeta plana">{% include 'partials/_lineas.html' %}</div>
+{% endblock %}

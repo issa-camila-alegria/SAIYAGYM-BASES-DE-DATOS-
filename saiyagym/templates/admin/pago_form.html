@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% from 'partials/_macros.html' import campo, seleccion %}
+{% block titulo %}{{ 'Registrar pago' if modo == 'nuevo' else 'Editar pago' }}{% endblock %}
+{% block contenido %}
+<div class="migas"><a href="{{ url_for('admin.pagos') }}">Pagos</a> / {{ 'Registrar' if modo == 'nuevo' else 'Editar' }}</div>
+<div class="cabecera"><div><h1>{{ 'Registrar pago' if modo == 'nuevo' else 'Editar pago' }}</h1>
+  <p>{% if modo == 'nuevo' %}El valor no puede superar el saldo pendiente de la membresía.{% else %}Solo los pagos pendientes pueden modificarse.{% endif %}</p></div></div>
+<div class="tarjeta">
+  <form method="post" class="formulario" novalidate>
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    {% if modo == 'nuevo' %}
+      {{ seleccion('cli_mem_id', 'Membresía adquirida', membresias, form.get('cli_mem_id',''), errores) }}
+    {% else %}
+      <p class="muted">{{ pago.cliente }} · {{ pago.memnombre }}</p>
+    {% endif %}
+    <div class="rejilla-form">
+      {{ campo('valor', 'Valor (COP)', form, errores, 'number', extra='min="1" step="1000"') }}
+      {{ seleccion('metodo', 'Método de pago', metodos, form.get('metodo',''), errores) }}
+    </div>
+    {% if modo == 'nuevo' %}
+      {{ seleccion('estado', 'Registrar como', [('PAGADO','Pagado (confirmado)'),('PENDIENTE','Pendiente de confirmar')], form.get('estado','PAGADO'), errores, requerido=true) }}
+    {% endif %}
+    <div class="row"><button class="btn btn-primario" type="submit">Guardar</button>
+      <a class="btn btn-txt" href="{{ url_for('admin.pagos') }}">Cancelar</a></div>
+  </form>
+</div>
+{% endblock %}

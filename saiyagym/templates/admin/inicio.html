@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+{% from 'partials/_macros.html' import icono, accion, vacio, barras, linea, dona, leyenda, brasas %}
+{% block titulo %}Resumen{% endblock %}
+{% block contenido %}
+<div class="cabecera">
+  {{ brasas(5) }}
+  <div>
+    <span class="sobretitulo">Panel del administrador</span>
+    <h1>Hola, {{ usuario.nombre }}</h1>
+    <p>Hoy han asistido {{ resumen.asistencias_hoy or 0 }} cliente(s) y esta semana van {{ resumen.asistencias_semana or 0 }} visitas al gimnasio.</p>
+  </div>
+  <div class="row">
+    {{ accion(url_for('admin.actualizar_estados'), 'Actualizar estados', 'btn') }}
+    <a class="btn btn-primario" href="{{ url_for('admin.pago_nuevo') }}">{{ icono('mas') }} Registrar pago</a>
+  </div>
+</div>
+
+<div class="rejilla g4">
+  <div class="tarjeta dato"><span class="valor">{{ resumen.clientes_activos or 0 }}</span><span class="etiqueta">Clientes activos</span><span class="nota">{{ resumen.entrenadores or 0 }} entrenadores activos</span></div>
+  <div class="tarjeta dato verde"><span class="valor">{{ resumen.membresias_vigentes or 0 }}</span><span class="etiqueta">Membresías vigentes</span><span class="nota">{{ resumen.por_vencer or 0 }} vencen en 7 días</span></div>
+  <div class="tarjeta dato"><span class="valor">{{ (resumen.recaudo_mes or 0)|moneda_corta }}</span><span class="etiqueta">Recaudo del mes</span><span class="nota">{{ (resumen.recaudo_mes or 0)|moneda }}</span></div>
+  <div class="tarjeta dato rojo"><span class="valor">{{ (resumen.cartera or 0)|moneda_corta }}</span><span class="etiqueta">Cartera por cobrar</span><span class="nota">{{ resumen.pagos_pendientes or 0 }} pago(s) por confirmar</span></div>
+</div>
+
+<div class="rejilla g2 mt">
+  <div class="tarjeta">
+    <div class="tarjeta-cab"><h2>Recaudo mensual</h2><span class="muted small">últimos 6 meses</span></div>
+    {{ barras(recaudo, dinero=true, ventana=1, rotulo='mes parcial vs. anterior') }}
+  </div>
+  <div class="tarjeta">
+    <div class="tarjeta-cab"><h2>Asistencia diaria</h2><span class="muted small">últimos 14 días</span></div>
+    {{ linea(asistencia, uid='adm', ventana=7, rotulo='vs. 7 días previos') }}
+  </div>
+</div>
+
+<div class="rejilla g3 mt">
+  <div class="tarjeta"><h2>Membresías por estado</h2>{{ dona(estados, {'ACTIVA':'ok','PENDIENTE':'acc','VENCIDA':'bad'}, 'membresías') }}</div>
+  <div class="tarjeta"><h2>Ventas por tipo</h2>{{ leyenda(ventas) }}</div>
+  <div class="tarjeta"><h2>Clientes por entrenador</h2>{{ leyenda(entrenadores) }}</div>
+</div>
+
+<div class="rejilla g-izq mt">
+  <div class="tarjeta plana">
+    <div class="tarjeta-cab pad"><h2>Saldos por cobrar</h2><a class="link small" href="{{ url_for('reportes.ver', codigo='REP-03') }}">Ver informe</a></div>
+    {% if por_pagar %}
+    <div class="tabla-caja"><table class="tabla">
+      <tbody>{% for f in por_pagar %}
+        <tr><td class="principal-celda">{{ f.cliente }}<span class="sec">{{ f.membresia }}</span></td>
+            <td class="right num">{{ f.saldo }}</td></tr>
+      {% endfor %}</tbody></table></div>
+    {% else %}{{ vacio('Sin saldos pendientes', 'Todas las membresías están al día.') }}{% endif %}
+  </div>
+  <div class="tarjeta">
+    <div class="tarjeta-cab"><h2>Top asistencia</h2><a class="link small" href="{{ url_for('reportes.ver', codigo='REP-05') }}">Ranking</a></div>
+    {% if ranking %}<ol class="podio">{% for f in ranking %}
+      <li><span>{{ f.cliente }}</span><strong class="num">{{ f.asistencias }}</strong></li>{% endfor %}</ol>
+    {% else %}{{ vacio('Sin asistencias registradas') }}{% endif %}
+  </div>
+</div>
+
+<div class="tarjeta plana mt">
+  <div class="tarjeta-cab pad"><h2>Para renovar</h2><a class="link small" href="{{ url_for('reportes.ver', codigo='REP-01') }}">Ver informe</a></div>
+  {% if vencidas %}
+  <div class="tabla-caja"><table class="tabla">
+    <thead><tr><th>Cliente</th><th>Correo</th><th class="right">Venció</th></tr></thead>
+    <tbody>{% for f in vencidas %}
+      <tr><td class="principal-celda">{{ f.cliente }}</td><td class="muted">{{ f.correo }}</td><td class="right small">{{ f.vencio }}</td></tr>
+    {% endfor %}</tbody></table></div>
+  {% else %}{{ vacio('Nadie por renovar', 'No hay clientes con membresía vencida.') }}{% endif %}
+</div>
+{% endblock %}

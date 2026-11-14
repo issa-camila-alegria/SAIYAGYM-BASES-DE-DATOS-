@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% from 'partials/_macros.html' import icono, insignia, accion, vacio %}
+{% block titulo %}Pagos{% endblock %}
+{% block contenido %}
+<div class="cabecera">
+  <div><h1>Pagos</h1><p>Un pago confirmado cuenta para el saldo; los anulados se conservan como historial.</p></div>
+  <a class="btn btn-primario" href="{{ url_for('admin.pago_nuevo') }}">{{ icono('mas') }} Registrar pago</a>
+</div>
+<div class="chips">
+  <a class="chip {{ 'activo' if not estado }}" href="{{ url_for('admin.pagos') }}">Todos</a>
+  {% for e in ['PAGADO','PENDIENTE','ANULADO'] %}<a class="chip {{ 'activo' if estado == e }}" href="{{ url_for('admin.pagos', estado=e) }}">{{ e|capitalize }}</a>{% endfor %}
+</div>
+<div class="tarjeta plana">
+{% if lista %}
+<div class="tabla-caja"><table class="tabla">
+  <thead><tr><th>Cliente</th><th>Fecha</th><th>Método</th><th class="right">Valor</th><th>Estado</th><th></th></tr></thead>
+  <tbody>{% for p in lista %}
+    <tr>
+      <td class="principal-celda">{{ p.cliente }}<span class="sec">{{ p.memnombre }}</span></td>
+      <td>{{ p.pagfecha|fecha }}</td>
+      <td>{{ p.pagmetodo|capitalize }}</td>
+      <td class="right num">{{ p.pagvalor|moneda }}</td>
+      <td>{{ insignia(p.pagestado) }}</td>
+      <td class="acciones">
+        {% if p.pagestado == 'PENDIENTE' %}
+          {{ accion(url_for('admin.pago_estado', id_=p.pagid), 'Confirmar', 'btn btn-sm btn-oscuro', '', {'estado': 'PAGADO'}) }}
+          <a class="btn btn-sm" href="{{ url_for('admin.pago_editar', id_=p.pagid) }}">Editar</a>
+          {{ accion(url_for('admin.pago_estado', id_=p.pagid), 'Anular', 'btn btn-sm', '¿Anular este pago?', {'estado': 'ANULADO'}) }}
+          {{ accion(url_for('admin.pago_eliminar', id_=p.pagid), 'Eliminar', 'btn btn-sm btn-peligro', '¿Eliminar este pago pendiente?') }}
+        {% elif p.pagestado == 'PAGADO' %}
+          {{ accion(url_for('admin.pago_estado', id_=p.pagid), 'Anular', 'btn btn-sm', '¿Anular este pago confirmado? El saldo de la membresía aumentará.', {'estado': 'ANULADO'}) }}
+        {% endif %}
+      </td>
+    </tr>{% endfor %}
+  </tbody></table></div>
+{% else %}{{ vacio('Sin pagos', 'No hay pagos con este filtro.') }}{% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+{% from 'partials/_macros.html' import campo, seleccion, accion %}
+{% block titulo %}{{ 'Nuevo usuario' if modo == 'nuevo' else 'Editar usuario' }}{% endblock %}
+{% block contenido %}
+<div class="migas"><a href="{{ url_for('admin.usuarios') }}">Usuarios</a> / {{ 'Nuevo' if modo == 'nuevo' else 'Editar' }}</div>
+<div class="cabecera"><div><h1>{{ 'Nuevo usuario' if modo == 'nuevo' else actual.usunombre ~ ' ' ~ actual.usuapellido }}</h1>
+  {% if modo == 'editar' %}<p>{{ actual.rolnombre|capitalize }} · el rol no se puede cambiar</p>{% endif %}</div></div>
+<div class="rejilla g-izq">
+<div class="tarjeta">
+  <form method="post" class="formulario ancho" novalidate>
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <div class="rejilla-form">
+      {{ campo('nombre', 'Nombre', form, errores, extra='maxlength="60" autocomplete="off"') }}
+      {{ campo('apellido', 'Apellido', form, errores, extra='maxlength="60" autocomplete="off"') }}
+      {{ campo('identificacion', 'Identificación', form, errores, 'text', 'Solo dígitos (5 a 15).', extra='inputmode="numeric" pattern="[0-9]{5,15}" maxlength="15"') }}
+      {{ campo('telefono', 'Teléfono', form, errores, 'tel', 'Celular de 10 dígitos que inicia en 3.', false, 'inputmode="numeric" pattern="3[0-9]{9}" maxlength="10"') }}
+    </div>
+    {{ campo('correo', 'Correo electrónico', form, errores, 'email', extra='maxlength="100" autocomplete="off"') }}
+    {% if modo == 'nuevo' %}
+      {{ seleccion('rol_id', 'Rol', roles.items()|list, form.get('rol_id', ''), errores) }}
+      {{ campo('clave', 'Contraseña inicial', form, errores, 'password', 'Mínimo 8 caracteres con mayúsculas, minúsculas y números.', extra='autocomplete="new-password"') }}
+    {% endif %}
+    <div class="row"><button class="btn btn-primario" type="submit">{{ 'Crear usuario' if modo == 'nuevo' else 'Guardar cambios' }}</button>
+      <a class="btn btn-txt" href="{{ url_for('admin.usuarios') }}">Cancelar</a></div>
+  </form>
+</div>
+{% if modo == 'editar' %}
+<div class="rejilla">
+  <div class="tarjeta">
+    <h2>Restablecer contraseña</h2>
+    <form method="post" action="{{ url_for('admin.usuario_clave', id_=actual.usuid) }}" class="formulario" novalidate>
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <div class="campo"><label for="clave">Nueva contraseña</label><input id="clave" name="clave" type="password" autocomplete="new-password" required></div>
+      <div><button class="btn" type="submit">Restablecer</button></div>
+    </form>
+  </div>
+  <div class="tarjeta">
+    <h2>Zona delicada</h2>
+    <p class="muted small mb">Si el usuario tiene historial no se puede eliminar; desactívalo desde el listado.</p>
+    {{ accion(url_for('admin.usuario_eliminar', id_=actual.usuid), 'Eliminar usuario', 'btn btn-peligro', 'Eliminar definitivamente a ' ~ actual.usunombre ~ '?') }}
+  </div>
+</div>
+{% endif %}
+</div>
+{% endblock %}

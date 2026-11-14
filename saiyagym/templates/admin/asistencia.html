@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% from 'partials/_macros.html' import vacio %}
+{% block titulo %}Asistencia{% endblock %}
+{% block contenido %}
+<div class="cabecera"><div><h1>Asistencia y rachas</h1><p>Elige un cliente para ver su constancia.</p></div></div>
+<form class="filtros" method="get">
+  <select name="cliente" data-auto>
+    <option value="">Seleccione un cliente...</option>
+    {% for c in clientes %}<option value="{{ c.usuid }}" {{ 'selected' if cliente == c.usuid }}>{{ c.usunombre }} {{ c.usuapellido }}</option>{% endfor %}
+  </select>
+  <noscript><button class="btn" type="submit">Ver</button></noscript>
+</form>
+{% if datos %}
+  {% with racha=datos.racha, estado=datos.estado, mejor=datos.mejor, logros=datos.logros %}{% include 'partials/_racha.html' %}{% endwith %}
+  <div class="rejilla g2 mt">
+    <div class="tarjeta plana"><div class="tarjeta-cab pad"><h2>Asistencias</h2></div>
+      {% if datos.lista %}<div class="tabla-caja"><table class="tabla"><tbody>
+        {% for a in datos.lista %}<tr><td>{{ a.asifecha|fecha }}</td><td class="right num">{{ a.asihoraentrada }}</td></tr>{% endfor %}
+      </tbody></table></div>{% else %}{{ vacio('Sin asistencias') }}{% endif %}</div>
+    <div class="tarjeta plana"><div class="tarjeta-cab pad"><h2>Rachas</h2></div>
+      {% if datos.rachas %}<div class="tabla-caja"><table class="tabla"><tbody>
+        {% for r in datos.rachas %}<tr><td>{{ r.rachainicio|fecha }} → {{ r.rachafin|fecha }}</td><td class="right num">{{ r.rachadias }} días</td></tr>{% endfor %}
+      </tbody></table></div>{% else %}{{ vacio('Sin rachas') }}{% endif %}</div>
+  </div>
+{% endif %}
+{% endblock %}

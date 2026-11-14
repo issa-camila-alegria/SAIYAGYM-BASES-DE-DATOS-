@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% from 'partials/_macros.html' import vacio %}
+{% block titulo %}Ejercicios{% endblock %}
+{% block contenido %}
+<div class="cabecera"><div><h1>Ejercicios</h1><p>Catálogo del gimnasio (lo mantienen los entrenadores).</p></div></div>
+<div class="tarjeta plana">
+{% if lista %}
+<div class="tabla-caja"><table class="tabla">
+  <thead><tr><th>Ejercicio</th><th>Grupo muscular</th><th>Nivel</th><th class="right">En rutinas</th></tr></thead>
+  <tbody>{% for e in lista %}
+    <tr><td class="principal-celda">{{ e.ejenombre }}<span class="sec">{{ e.ejedescripcion or '' }}</span></td>
+        <td>{{ e.ejegrupomuscular }}</td><td>{{ e.ejeniveldificultad|capitalize }}</td><td class="right num">{{ e.enrutinas }}</td></tr>
+  {% endfor %}</tbody></table></div>
+{% else %}{{ vacio('Sin ejercicios') }}{% endif %}
+</div>
+{% endblock %}

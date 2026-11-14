@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+{% from 'partials/_macros.html' import icono, insignia, accion, vacio, llama, brasas %}
+{% block titulo %}Mi panel{% endblock %}
+{% block contenido %}
+{% set vigente = racha if estado == 'VIGENTE' else 0 %}
+{% set nivel = 0 if vigente == 0 else (1 if vigente < 3 else (2 if vigente < 7 else (3 if vigente < 14 else 4))) %}
+<section class="heroe {{ 'encendido' if vigente }} nivel-{{ nivel }}">
+  <div class="anillo {{ 'apagado' if vigente == 0 }}" role="img" aria-label="Racha de {{ racha }} días">
+    <svg viewBox="0 0 120 120" fill="none" stroke-width="9">
+      <circle class="pista" cx="60" cy="60" r="52"/>
+      <circle class="progreso" cx="60" cy="60" r="52" stroke-dasharray="{{ ((vigente / meta) * 326.7)|round(1) }} 326.7"/>
+    </svg>
+    {% if vigente %}{{ brasas(3 + nivel) }}{% endif %}
+    <div class="centro"><div><span class="llama-hero">{{ llama(vigente == 0) }}</span><strong class="contar">{{ vigente }}</strong><span>días seguidos</span></div></div>
+  </div>
+  <div>
+    <h1>{% if hoy %}Hoy ya cumpliste, {{ usuario.nombre }}{% elif vigente %}Mantén la racha, {{ usuario.nombre }}{% else %}Empieza hoy, {{ usuario.nombre }}{% endif %}</h1>
+    <p class="sub">
+      {% if vigente %}Te faltan {{ meta - vigente }} día(s) para tu próximo logro de {{ meta }} días.
+      {% elif estado == 'INTERRUMPIDA' %}Tu racha se interrumpió. Tu mejor marca fue de {{ mejor }} días: ¡vamos por más!
+      {% else %}Registra tu primera asistencia y empieza a construir tu racha.{% endif %}
+    </p>
+  </div>
+  <div>
+    {% if hoy %}<span class="badge ok">Asistencia de hoy registrada</span>
+    {% else %}{{ accion(url_for('cliente.registrar_asistencia'), 'Registrar asistencia', 'btn btn-primario btn-lg') }}{% endif %}
+  </div>
+</section>
+
+<div class="tarjeta mt">
+  <div class="tarjeta-cab"><h2>Esta semana</h2><span class="muted small">{{ semana|selectattr('asistio')|list|length }} de 7 días</span></div>
+  <div class="semana">{% for d in semana %}
+    <div class="dia {{ 'asistio' if d.asistio }} {{ 'hoy' if d.hoy }}"><span>{{ d.etiqueta }}</span><strong>{{ d.numero }}</strong><span class="marca-dia">✓</span></div>
+  {% endfor %}</div>
+</div>
+
+<div class="rejilla g3 mt">
+  <div class="tarjeta dato"><span class="valor">{{ mejor }}</span><span class="etiqueta">Mejor racha (días)</span><span class="nota">{{ total_asistencias }} asistencias en total</span></div>
+  <div class="tarjeta">
+    <div class="logros">{% for l in logros %}<div class="logro {{ 'logrado' if l.estado == 'LOGRADO' }}" title="{{ l.titulo }}"><strong>{{ l.dias }}</strong><span>días</span></div>{% endfor %}</div>
+    <p class="muted small mt">Logros de constancia</p>
+  </div>
+  <div class="tarjeta">
+    {% if membresia %}
+      <div class="row between"><h3>{{ membresia.memnombre }}</h3>{{ insignia(membresia.climemestado) }}</div>
+      <p class="muted small mt">Vence el {{ membresia.climemfechafin|fecha_larga }}</p>
+      <progress value="{{ membresia.diasrestantes }}" max="{{ ((membresia.climemfechafin - membresia.climemfechainicio).days) or 1 }}"></progress>
+      <p class="small mt">{{ membresia.diasrestantes }} días restantes{% if membresia.saldo and membresia.saldo > 0 %} · saldo {{ membresia.saldo|moneda }}{% endif %}</p>
+    {% else %}
+      <h3>Sin membresía vigente</h3><p class="muted small mt">Consulta en recepción para renovar la tuya.</p>
+    {% endif %}
+  </div>
+</div>
+
+<div class="rejilla g2 mt">
+  <div class="tarjeta plana">
+    <div class="tarjeta-cab pad"><h2>Mis rutinas</h2><a class="link small" href="{{ url_for('cliente.rutinas') }}">Ver todas</a></div>
+    {% if rutinas %}<div class="tabla-caja"><table class="tabla"><tbody>
+      {% for a in rutinas %}<tr><td class="principal-celda"><a href="{{ url_for('cliente.rutina_detalle', id_=a.asirutid) }}">{{ a.rutnombre }}</a>
+        <span class="sec">{{ a.rutobjetivo }} · con {{ a.entrenador }}</span></td><td class="right">{{ icono('flecha') }}</td></tr>{% endfor %}
+    </tbody></table></div>{% else %}{{ vacio('Sin rutinas activas', 'Tu entrenador te asignará una pronto.') }}{% endif %}
+  </div>
+  <div class="tarjeta plana">
+    <div class="tarjeta-cab pad"><h2>Últimas asistencias</h2><a class="link small" href="{{ url_for('cliente.asistencias') }}">Ver historial</a></div>
+    {% if ultimas %}<div class="tabla-caja"><table class="tabla"><tbody>
+      {% for a in ultimas %}<tr><td>{{ a.asifecha|fecha }}</td><td class="right num muted">{{ a.asihoraentrada }}</td></tr>{% endfor %}
+    </tbody></table></div>{% else %}{{ vacio('Aún no registras asistencias') }}{% endif %}
+  </div>
+</div>
+{% endblock %}

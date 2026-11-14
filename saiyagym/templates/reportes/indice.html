@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% from 'partials/_macros.html' import icono %}
+{% block titulo %}Informes{% endblock %}
+{% block contenido %}
+<div class="cabecera"><div><h1>Informes</h1><p>Los que tu rol puede consultar.</p></div></div>
+<div class="rejilla g3">
+  {% for codigo, i in informes.items() %}
+  <a class="tarjeta enlace-tarjeta" href="{{ url_for('reportes.ver', codigo=codigo) }}">
+    <span class="badge off">{{ codigo }}</span>
+    <h2 class="mt">{{ i[0] }}</h2>
+    <p class="muted small mt">{{ i[1] }}</p>
+  </a>
+  {% endfor %}
+</div>
+{% endblock %}

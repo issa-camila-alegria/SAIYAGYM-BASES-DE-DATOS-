@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% from 'partials/_macros.html' import icono, accion, vacio %}
+{% block titulo %}Ejercicios{% endblock %}
+{% block contenido %}
+<div class="cabecera">
+  <div><h1>Ejercicios</h1><p>El catálogo que usas para armar rutinas.</p></div>
+  <a class="btn btn-primario" href="{{ url_for('entrenador.ejercicio_nuevo') }}">{{ icono('mas') }} Nuevo ejercicio</a>
+</div>
+<div class="chips">
+  <a class="chip {{ 'activo' if not grupo }}" href="{{ url_for('entrenador.ejercicios') }}">Todos</a>
+  {% for g in grupos %}<a class="chip {{ 'activo' if grupo == g }}" href="{{ url_for('entrenador.ejercicios', grupo=g) }}">{{ g }}</a>{% endfor %}
+</div>
+<div class="tarjeta plana">
+{% if lista %}
+<div class="tabla-caja"><table class="tabla">
+  <thead><tr><th>Ejercicio</th><th>Grupo</th><th>Nivel</th><th class="right">En rutinas</th><th></th></tr></thead>
+  <tbody>{% for e in lista %}
+    <tr><td class="principal-celda">{{ e.ejenombre }}<span class="sec">{{ e.ejedescripcion or '' }}</span></td>
+        <td>{{ e.ejegrupomuscular }}</td><td>{{ e.ejeniveldificultad|capitalize }}</td><td class="right num">{{ e.enrutinas }}</td>
+        <td class="acciones"><a class="btn btn-sm" href="{{ url_for('entrenador.ejercicio_editar', id_=e.ejeid) }}">Editar</a>
+          {{ accion(url_for('entrenador.ejercicio_eliminar', id_=e.ejeid), 'Eliminar', 'btn btn-sm btn-peligro', '¿Eliminar el ejercicio ' ~ e.ejenombre ~ '?') }}</td></tr>
+  {% endfor %}</tbody></table></div>
+{% else %}{{ vacio('Sin ejercicios', 'Crea el primero o prueba otro filtro.') }}{% endif %}
+</div>
+{% endblock %}

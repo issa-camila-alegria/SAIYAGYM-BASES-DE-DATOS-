@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% from 'partials/_macros.html' import icono, insignia, accion, vacio %}
+{% block titulo %}Membresías adquiridas{% endblock %}
+{% block contenido %}
+<div class="cabecera">
+  <div><h1>Membresías adquiridas</h1><p>Historial de compras por cliente, con su saldo.</p></div>
+  <a class="btn btn-primario" href="{{ url_for('admin.adquirida_nueva') }}">{{ icono('mas') }} Registrar membresía</a>
+</div>
+<form class="filtros" method="get">
+  <select name="cliente" data-auto>
+    <option value="">Todos los clientes</option>
+    {% for c in clientes %}<option value="{{ c.usuid }}" {{ 'selected' if cliente == c.usuid }}>{{ c.usunombre }} {{ c.usuapellido }}</option>{% endfor %}
+  </select>
+  <noscript><button class="btn" type="submit">Filtrar</button></noscript>
+</form>
+<div class="tarjeta plana">
+{% if lista %}
+<div class="tabla-caja"><table class="tabla">
+  <thead><tr><th>Cliente</th><th>Vigencia</th><th class="right">Pactado</th><th class="right">Pagado</th><th class="right">Saldo</th><th>Estado</th><th></th></tr></thead>
+  <tbody>{% for m in lista %}
+    <tr>
+      <td class="principal-celda">{{ m.cliente }}<span class="sec">{{ m.memnombre }}</span></td>
+      <td class="small">{{ m.climemfechainicio|fecha }} → {{ m.climemfechafin|fecha }}</td>
+      <td class="right num">{{ m.climemvalor|moneda }}</td>
+      <td class="right num">{{ m.totalpagado|moneda }}</td>
+      <td class="right num">{{ m.saldo|moneda }}</td>
+      <td>{{ insignia(m.climemestado) }}</td>
+      <td class="acciones">
+        {% if m.saldo and m.saldo > 0 %}<a class="btn btn-sm" href="{{ url_for('admin.pago_nuevo', cm=m.climemid) }}">Registrar pago</a>{% endif %}
+        {% if m.climemestado == 'PENDIENTE' %}{{ accion(url_for('admin.adquirida_eliminar', id_=m.climemid), 'Eliminar', 'btn btn-sm btn-peligro', '¿Eliminar este registro pendiente?') }}{% endif %}
+      </td>
+    </tr>{% endfor %}
+  </tbody></table></div>
+{% else %}{{ vacio('Sin membresías adquiridas') }}{% endif %}
+</div>
+{% endblock %}

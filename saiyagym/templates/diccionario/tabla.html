@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% block titulo %}{{ tabla }}{% endblock %}
+{% block contenido %}
+<div class="migas"><a href="{{ url_for('diccionario.indice') }}">Diccionario de datos</a> / {{ tabla }}</div>
+<div class="cabecera"><div><h1>{{ tabla }}</h1><p>{{ columnas|length }} columnas · {{ restricciones|length }} restricciones · {{ indices|length }} índices</p></div></div>
+<div class="tarjeta plana"><div class="tarjeta-cab pad"><h2>Columnas</h2></div>
+  <div class="tabla-caja"><table class="tabla">
+    <thead><tr><th>#</th><th>Columna</th><th>Tipo</th><th>Admite nulos</th><th>Llave</th></tr></thead>
+    <tbody>{% for c in columnas %}<tr><td class="num muted">{{ c.posicion }}</td><td class="principal-celda">{{ c.columna }}</td>
+      <td>{{ c.tipo }}</td><td>{{ c.admite_nulos }}</td><td>{% if c.llave %}<span class="badge warn">{{ c.llave }}</span>{% endif %}</td></tr>{% endfor %}
+    </tbody></table></div></div>
+<div class="rejilla g2 mt">
+  <div class="tarjeta plana"><div class="tarjeta-cab pad"><h2>Restricciones</h2></div>
+    <div class="tabla-caja"><table class="tabla"><tbody>{% for r in restricciones %}<tr>
+      <td class="principal-celda">{{ r.restriccion }}<span class="sec">{{ r.tipo }}{% if r.referencia %} → {{ r.referencia }}{% endif %}</span></td><td class="right muted small">{{ r.estado }}</td></tr>{% endfor %}</tbody></table></div></div>
+  <div class="tarjeta plana"><div class="tarjeta-cab pad"><h2>Índices</h2></div>
+    <div class="tabla-caja"><table class="tabla"><tbody>{% for i in indices %}<tr>
+      <td class="principal-celda">{{ i.indice }}<span class="sec">{{ i.columnas }}</span></td><td class="right muted small">{{ i.unicidad }}</td></tr>{% endfor %}</tbody></table></div></div>
+</div>
+{% endblock %}

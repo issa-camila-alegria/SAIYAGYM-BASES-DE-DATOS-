@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% from 'partials/_macros.html' import campo %}
+{% block titulo %}Mi perfil{% endblock %}
+{% block contenido %}
+<div class="cabecera"><div><h1>Mi perfil</h1><p>Tus datos y la seguridad de tu cuenta.</p></div></div>
+<div class="rejilla g2">
+  <div class="tarjeta">
+    <h2>Datos personales</h2>
+    <dl class="kv">
+      <dt>Nombre</dt><dd>{{ datos.usunombre }} {{ datos.usuapellido }}</dd>
+      <dt>Identificación</dt><dd class="num">{{ datos.usuidentificacion }}</dd>
+      <dt>Correo</dt><dd>{{ datos.usucorreo }}</dd>
+      <dt>Teléfono</dt><dd>{{ datos.usutelefono or '—' }}</dd>
+      <dt>Rol</dt><dd>{{ datos.rolnombre|capitalize }}</dd>
+      <dt>Miembro desde</dt><dd>{{ datos.usufecharegistro|fecha }}</dd>
+    </dl>
+    <p class="muted small mt">Para corregir tus datos, solicítalo al administrador.</p>
+  </div>
+  <div class="tarjeta">
+    <h2>Cambiar contraseña</h2>
+    <form method="post" class="formulario" novalidate>
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      {{ campo('actual', 'Contraseña actual', {}, errores, 'password', extra='autocomplete="current-password"') }}
+      {{ campo('nueva', 'Nueva contraseña', {}, errores, 'password', 'Mínimo 8 caracteres con mayúsculas, minúsculas y números.', extra='autocomplete="new-password"') }}
+      {{ campo('repetir', 'Repite la nueva contraseña', {}, errores, 'password', extra='autocomplete="new-password"') }}
+      <div><button class="btn btn-oscuro" type="submit">Guardar contraseña</button></div>
+    </form>
+  </div>
+</div>
+{% endblock %}

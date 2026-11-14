@@ -1,0 +1,9 @@
+{# Resumen de racha y logros. Variables: racha, estado, mejor, logros #}
+<div class="rejilla g3">
+  {% from 'partials/_macros.html' import fuego %}
+  <div class="tarjeta dato acento racha-{{ 'vigente' if estado == 'VIGENTE' else ('vencida' if estado == 'INTERRUMPIDA' else 'sin') }}"><span class="valor">{{ fuego(estado, racha) }} {{ racha }} <span class="small muted">días</span></span><span class="etiqueta">Racha actual · {{ 'Vencida' if estado == 'INTERRUMPIDA' else estado|capitalize }}</span></div>
+  <div class="tarjeta dato"><span class="valor">{{ mejor }} <span class="small muted">días</span></span><span class="etiqueta">Mejor racha histórica</span></div>
+  <div class="tarjeta"><div class="logros">
+    {% for l in logros %}<div class="logro {{ 'logrado' if l.estado == 'LOGRADO' }}" title="{{ l.titulo }}"><strong>{{ l.dias }}</strong><span>días</span></div>{% endfor %}
+  </div><p class="muted small mt">Logros de constancia</p></div>
+</div>

@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% from 'partials/_macros.html' import icono, insignia, vacio, linea %}
+{% block titulo %}Resumen{% endblock %}
+{% block contenido %}
+<div class="cabecera">
+  <div><span class="sobretitulo">Panel del entrenador</span><h1>Hola, {{ usuario.nombre }}</h1><p>Tu trabajo de hoy en un vistazo: clientes, rutinas y constancia de tu grupo.</p></div>
+  <a class="btn btn-primario" href="{{ url_for('entrenador.asignacion_nueva') }}">{{ icono('mas') }} Asignar rutina</a>
+</div>
+<div class="rejilla g3">
+  <div class="tarjeta dato"><span class="valor">{{ clientes|length }}</span><span class="etiqueta">Clientes asignados</span></div>
+  <div class="tarjeta dato"><span class="valor">{{ rutinas|length }}</span><span class="etiqueta">Rutinas creadas por ti</span></div>
+  <div class="tarjeta dato acento"><span class="valor">{{ asignaciones|length }}</span><span class="etiqueta">Asignaciones activas</span></div>
+</div>
+<div class="rejilla g-izq mt">
+  <div class="tarjeta"><div class="tarjeta-cab"><h2>Asistencia de tus clientes</h2><span class="muted small">últimos 14 días</span></div>{{ linea(asistencia, uid='ent', ventana=7, rotulo='vs. 7 días previos') }}</div>
+  <div class="tarjeta"><div class="tarjeta-cab"><h2>Más constantes</h2><a class="link small" href="{{ url_for('reportes.ver', codigo='REP-05') }}">Ranking</a></div>
+    {% if ranking %}<ol class="podio">{% for f in ranking %}<li><span>{{ f.cliente }}</span><strong class="num">{{ f.asistencias }}</strong></li>{% endfor %}</ol>
+    {% else %}{{ vacio('Sin asistencias aún') }}{% endif %}</div>
+</div>
+<div class="rejilla g2 mt-lg">
+  <div class="tarjeta plana">
+    <div class="tarjeta-cab pad"><h2>Mis clientes</h2><a class="link small" href="{{ url_for('entrenador.clientes') }}">Ver todos</a></div>
+    {% if clientes %}<div class="tabla-caja"><table class="tabla"><tbody>
+      {% for c in clientes[:5] %}<tr><td class="principal-celda"><a href="{{ url_for('entrenador.cliente_detalle', id_=c.usuid) }}">{{ c.usunombre }} {{ c.usuapellido }}</a>
+        <span class="sec">{{ c.asignaciones }} asignación(es)</span></td><td class="right">{{ insignia(c.usuestado) }}</td></tr>{% endfor %}
+    </tbody></table></div>{% else %}{{ vacio('Aún no tienes clientes', 'Asigna tu primera rutina y aparecerán aquí.') }}{% endif %}
+  </div>
+  <div class="tarjeta plana">
+    <div class="tarjeta-cab pad"><h2>Asignaciones activas</h2><a class="link small" href="{{ url_for('entrenador.asignaciones') }}">Ver todas</a></div>
+    {% if asignaciones %}<div class="tabla-caja"><table class="tabla"><tbody>
+      {% for a in asignaciones[:5] %}<tr><td class="principal-celda">{{ a.cliente }}<span class="sec">{{ a.rutnombre }}</span></td>
+        <td class="right muted small">desde {{ a.asirutfechaasignacion|fecha }}</td></tr>{% endfor %}
+    </tbody></table></div>{% else %}{{ vacio('Sin asignaciones activas') }}{% endif %}
+  </div>
+</div>
+{% endblock %}

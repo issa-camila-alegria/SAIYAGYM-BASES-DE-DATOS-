@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% from 'partials/_macros.html' import campo, seleccion %}
+{% block titulo %}{{ 'Nueva membresía' if modo == 'nueva' else 'Editar membresía' }}{% endblock %}
+{% block contenido %}
+<div class="migas"><a href="{{ url_for('admin.membresias') }}">Membresías</a> / {{ 'Nueva' if modo == 'nueva' else 'Editar' }}</div>
+<div class="cabecera"><div><h1>{{ 'Nueva membresía' if modo == 'nueva' else tipo.memnombre }}</h1></div></div>
+<div class="tarjeta">
+  <form method="post" class="formulario" novalidate>
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    {{ campo('nombre', 'Nombre', form, errores, extra='maxlength="100"') }}
+    <div class="rejilla-form">
+      {{ campo('duracion', 'Duración (días)', form, errores, 'number', extra='min="1" max="3650"') }}
+      {{ campo('precio', 'Precio (COP)', form, errores, 'number', extra='min="1" step="1000"') }}
+    </div>
+    {{ campo('descripcion', 'Descripción', form, errores, 'text', requerido=false, extra='maxlength="200"') }}
+    {% if modo == 'editar' %}
+      {{ seleccion('estado', 'Estado', [('ACTIVA','Activa'),('INACTIVA','Inactiva')], form.get('estado','ACTIVA'), errores, requerido=true) }}
+    {% endif %}
+    <div class="row"><button class="btn btn-primario" type="submit">Guardar</button>
+      <a class="btn btn-txt" href="{{ url_for('admin.membresias') }}">Cancelar</a></div>
+  </form>
+</div>
+{% endblock %}

@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% block titulo %}{{ nombre }}{% endblock %}
+{% block contenido %}
+<div class="migas"><a href="{{ url_for('diccionario.indice') }}">Diccionario de datos</a> / {{ nombre }}</div>
+<div class="cabecera"><div><h1>{{ nombre }}</h1><p>{{ tipo|capitalize }} · {{ codigo|length }} líneas de código</p></div></div>
+{% if subprogramas %}
+<div class="tarjeta plana mb"><div class="tarjeta-cab pad"><h2>Subprogramas del paquete</h2></div>
+  <div class="tabla-caja"><table class="tabla">
+    <thead><tr><th>Subprograma</th><th class="right">Parámetros</th></tr></thead>
+    <tbody>{% for s in subprogramas %}<tr><td class="principal-celda">{{ s.subprograma }}</td><td class="right num">{{ s.parametros }}</td></tr>{% endfor %}</tbody>
+  </table></div></div>
+{% endif %}
+<pre class="codigo">{% for l in codigo %}<span class="ln">{{ l.linea }}</span>{{ l.codigo }}
+{% endfor %}</pre>
+{% endblock %}
